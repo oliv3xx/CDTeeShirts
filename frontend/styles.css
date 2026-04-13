@@ -9,6 +9,25 @@ body {
     background: #f8f8f8;
     color: #333;
     line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.hero,
+.featured,
+.shop-hero,
+.shop-section,
+.cart-section {
+    flex: 1;
+}
+
+.auth-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 60px 20px;
 }
 
 header {
@@ -45,6 +64,11 @@ nav a:hover {
     padding: 140px 20px;
     background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://source.unsplash.com/random/1600x900/?streetwear') center/cover no-repeat;
     color: white;
+}
+
+.shop-hero {
+    padding: 40px;
+    text-align: center;
 }
 
 .hero h2 {
@@ -149,4 +173,101 @@ footer {
     background: #111;
     color: #aaa;
     margin-top: 60px;
+}
+
+/* Login / Register Page */
+.auth-section {
+    max-width: 480px;
+    margin: 80px auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    padding: 40px;
+}
+ 
+.auth-tabs {
+    display: flex;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #eee;
+}
+ 
+.auth-tab {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    color: #aaa;
+    background: none;
+    border: none;
+}
+ 
+.auth-tab.active {
+    color: #000;
+    border-bottom: 2px solid #000;
+    margin-bottom: -2px;
+}
+ 
+.auth-form {
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+}
+ 
+.auth-form.active {
+    display: flex;
+}
+ 
+.auth-form input {
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    width: 100%;
+}
+ 
+.auth-form input:focus {
+    outline: none;
+    border-color: #000;
+}
+ 
+.auth-form button {
+    background: #000;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 8px;
+}
+ 
+.auth-form button:hover {
+    background: #333;
+}
+ 
+.auth-message {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 8px;
+    min-height: 20px;
+}
+ 
+.auth-message.error {
+    color: #c0392b;
+}
+ 
+.auth-message.success {
+    color: #27ae60;
+}
+ 
+.form-row {
+    display: flex;
+    gap: 12px;
+}
+ 
+.form-row input {
+    flex: 1;
 }

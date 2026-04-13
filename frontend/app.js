@@ -38,6 +38,7 @@ const products = [
     }
 ];
 
+// CART ------------------------------------------------
 let cart = [];
 
 function saveCart() {
@@ -72,6 +73,7 @@ function updateCartCount() {
     countElements.forEach(el => el.textContent = totalItems);
 }
 
+// PRODUCTS GRID ------------------------------------------
 function renderProducts(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -100,6 +102,7 @@ function renderProducts(containerId) {
     });
 }
 
+// CART PAGE ------------------------------------------
 function renderCart() {
     const container = document.getElementById('cart-items');
     const totalEl = document.getElementById('cart-total');
@@ -169,7 +172,7 @@ function setupCheckout() {
     if (checkoutBtn) {
         checkoutBtn.addEventListener('click', () => {
             if (cart.length === 0) return;
-            alert("Thank you for shopping at Tshirteers! (This is a demo)");
+            alert("Thank you for shopping at CDTeeShirts! (This is a demo)");
             cart = [];
             saveCart();
             renderCart();
@@ -178,12 +181,97 @@ function setupCheckout() {
     }
 }
 
+// LOGIN / REGISTER -------------------------------------------
+function showTab(tab) {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+ 
+    if (tab === 'login') {
+        document.querySelectorAll('.auth-tab')[0].classList.add('active');
+        document.getElementById('login-form').classList.add('active');
+    } else {
+        document.querySelectorAll('.auth-tab')[1].classList.add('active');
+        document.getElementById('register-form').classList.add('active');
+    }
+}
+ 
+function setupLoginForm() {
+    const loginForm = document.getElementById('login-form');
+    if (!loginForm) return;
+ 
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const msg = document.getElementById('login-message');
+        msg.className = 'auth-message';
+        msg.textContent = 'Logging in...';
+ 
+        const res = await fetch('backend/api/login.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: document.getElementById('login-username').value,
+                password: document.getElementById('login-password').value
+            })
+        });
+ 
+        const data = await res.json();
+ 
+        if (data.success) {
+            localStorage.setItem('user', JSON.stringify(data));
+            msg.className = 'auth-message success';
+            msg.textContent = `Welcome back, ${data.first_name || data.username}!`;
+            setTimeout(() => window.location.href = 'index.html', 1000);
+        } else {
+            msg.className = 'auth-message error';
+            msg.textContent = data.error || 'Login failed.';
+        }
+    });
+}
+ 
+function setupRegisterForm() {
+    const registerForm = document.getElementById('register-form');
+    if (!registerForm) return;
+ 
+    registerForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const msg = document.getElementById('register-message');
+        msg.className = 'auth-message';
+        msg.textContent = 'Creating account...';
+ 
+        const res = await fetch('backend/api/register.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username:   document.getElementById('reg-username').value,
+                email:      document.getElementById('reg-email').value,
+                password:   document.getElementById('reg-password').value,
+                first_name: document.getElementById('reg-firstname').value,
+                last_name:  document.getElementById('reg-lastname').value
+            })
+        });
+ 
+        const data = await res.json();
+ 
+        if (data.success) {
+            msg.className = 'auth-message success';
+            msg.textContent = 'Account created! Switching to login...';
+            setTimeout(() => showTab('login'), 1500);
+        } else {
+            msg.className = 'auth-message error';
+            msg.textContent = data.error || 'Registration failed.';
+        }
+    });
+}
+
+// INITIALIZATION -------------------------------------------
 function init() {
     loadCart();
     renderProducts('featured-products');
     renderProducts('shop-products');
     renderCart();
     setupCheckout();
+    setupLoginForm();
+    setupRegisterForm();
     updateCartCount();
 }
 
