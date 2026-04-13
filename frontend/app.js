@@ -40,33 +40,45 @@ const products = [
 
 // CART ------------------------------------------------
 let cart = [];
-
+ 
 function saveCart() {
     localStorage.setItem('cart', JSON.stringify(cart));
 }
-
+ 
 function loadCart() {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) cart = JSON.parse(savedCart);
     updateCartCount();
 }
-
+ 
 function addToCart(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
-
+ 
     const existing = cart.find(item => item.id === productId);
     if (existing) {
         existing.quantity += 1;
     } else {
         cart.push({ ...product, quantity: 1 });
     }
-
+ 
     saveCart();
     updateCartCount();
-    alert(`${product.name} added to cart!`);
+    showToast(`${product.name} added to cart!`);
 }
-
+ 
+function showToast(message) {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+}
+ 
 function updateCartCount() {
     const countElements = document.querySelectorAll('#cart-count');
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -103,35 +115,33 @@ function renderProducts(containerId) {
 }
 
 // CART PAGE ------------------------------------------
+const TAX_RATE = 0.0825;
+let discountPercent = 0;
+ 
 function renderCart() {
     const container = document.getElementById('cart-items');
-    const totalEl = document.getElementById('cart-total');
+    const summary   = document.getElementById('cart-summary');
     if (!container) return;
-
+ 
     container.innerHTML = '';
-
+ 
     if (cart.length === 0) {
-        container.innerHTML = '<p>Your cart is empty. <a href="shop.html">Go shopping</a></p>';
-        totalEl.textContent = '0';
+        container.innerHTML = '<p style="color:#666;">Your cart is empty. <a href="shop.html">Go shopping</a></p>';
+        if (summary) summary.style.display = 'none';
         return;
     }
-
-    let total = 0;
-
+ 
     cart.forEach((item, index) => {
-        const itemTotal = item.price * item.quantity;
-        total += itemTotal;
-
         const div = document.createElement('div');
         div.className = 'cart-item';
         div.innerHTML = `
             <img src="${item.img}" alt="${item.name}">
             <div class="cart-item-info">
                 <h3>${item.name}</h3>
-                <p>$${item.price} × ${item.quantity}</p>
+                <p>$${item.price.toFixed(2)} × ${item.quantity}</p>
             </div>
             <div class="cart-item-actions">
-                <button class="qty-btn" data-index="${index}" data-action="minus">-</button>
+                <button class="qty-btn" data-index="${index}" data-action="minus">−</button>
                 <span>${item.quantity}</span>
                 <button class="qty-btn" data-index="${index}" data-action="plus">+</button>
                 <button class="remove-btn" data-index="${index}">Remove</button>
@@ -139,23 +149,22 @@ function renderCart() {
         `;
         container.appendChild(div);
     });
-
-    totalEl.textContent = total;
-
+ 
+    if (summary) summary.style.display = 'block';
+    updateCartSummary();
+ 
     document.querySelectorAll('.qty-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const index = parseInt(btn.getAttribute('data-index'));
+            const index  = parseInt(btn.getAttribute('data-index'));
             const action = btn.getAttribute('data-action');
-
             if (action === 'plus') cart[index].quantity += 1;
             else if (action === 'minus' && cart[index].quantity > 1) cart[index].quantity -= 1;
-
             saveCart();
             renderCart();
             updateCartCount();
         });
     });
-
+ 
     document.querySelectorAll('.remove-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const index = parseInt(btn.getAttribute('data-index'));
@@ -166,14 +175,60 @@ function renderCart() {
         });
     });
 }
-
+ 
+function updateCartSummary() {
+    const subtotal       = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const discountAmount = subtotal * (discountPercent / 100);
+    const taxable        = subtotal - discountAmount;
+    const tax            = taxable * TAX_RATE;
+    const total          = taxable + tax;
+ 
+    const subtotalEl  = document.getElementById('cart-subtotal');
+    const discountEl  = document.getElementById('cart-discount');
+    const discountRow = document.getElementById('discount-row');
+    const taxEl       = document.getElementById('cart-tax');
+    const totalEl     = document.getElementById('cart-total');
+ 
+    if (subtotalEl)  subtotalEl.textContent  = subtotal.toFixed(2);
+    if (taxEl)       taxEl.textContent        = tax.toFixed(2);
+    if (totalEl)     totalEl.textContent      = total.toFixed(2);
+ 
+    if (discountPercent > 0 && discountEl && discountRow) {
+        discountEl.textContent    = discountAmount.toFixed(2);
+        discountRow.style.display = 'flex';
+    } else if (discountRow) {
+        discountRow.style.display = 'none';
+    }
+}
+ 
 function setupCheckout() {
+    const applyBtn   = document.getElementById('apply-discount');
     const checkoutBtn = document.getElementById('checkout-btn');
+ 
+    if (applyBtn) {
+        applyBtn.addEventListener('click', () => {
+            const code = document.getElementById('discount-input').value.trim().toUpperCase();
+            const msg  = document.getElementById('discount-msg');
+ 
+            if (code === 'SAVE10') {
+                discountPercent = 10;
+                msg.className   = 'discount-msg success';
+                msg.textContent = '10% discount applied!';
+            } else {
+                discountPercent = 0;
+                msg.className   = 'discount-msg error';
+                msg.textContent = 'Invalid or expired discount code.';
+            }
+            updateCartSummary();
+        });
+    }
+ 
     if (checkoutBtn) {
         checkoutBtn.addEventListener('click', () => {
             if (cart.length === 0) return;
             alert("Thank you for shopping at CDTeeShirts! (This is a demo)");
             cart = [];
+            discountPercent = 0;
             saveCart();
             renderCart();
             updateCartCount();
