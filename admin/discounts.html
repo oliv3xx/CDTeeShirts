@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Discount Codes</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<div class="admin-layout">
+
+    <aside class="admin-sidebar">
+        <h2>Admin Panel</h2>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="items.html">Items</a>
+        <a href="users.html">Users</a>
+        <a href="orders.html">Orders</a>
+        <a href="discounts.html" class="active">Discount Codes</a>
+        <a href="../index.html" style="margin-top:40px; color:#666;">← Back to Site</a>
+    </aside>
+
+    <main class="admin-main">
+        <h1>Discount Codes</h1>
+
+        <div class="admin-table-wrap">
+            <div class="admin-table-header">
+                <h2>All Codes</h2>
+                <button class="btn-primary" onclick="openModal()">+ Add Code</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Discount %</th>
+                        <th>Expiration</th>
+                        <th>Active</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="discounts-table">
+                    <tr><td colspan="5" style="text-align:center; color:#aaa;">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+</div>
+
+<!-- Add Modal -->
+<div class="modal-overlay" id="modal">
+    <div class="modal">
+        <h2>Add Discount Code</h2>
+        <div class="modal-form">
+            <input type="text" id="code-value" placeholder="Code (e.g. SAVE20)" required>
+            <input type="number" id="code-percent" placeholder="Discount %" step="0.01" required>
+            <input type="date" id="code-expiry">
+            <label style="display:flex; align-items:center; gap:8px; font-size:14px;">
+                <input type="checkbox" id="code-active" checked> Active
+            </label>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-save" onclick="saveCode()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function loadDiscounts() {
+        const res  = await fetch('../backend/api/admin_discounts.php');
+        const data = await res.json();
+        const tbody = document.getElementById('discounts-table');
+
+        if (!data.length) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#aaa;">No codes found.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = data.map(d => `
+            <tr>
+                <td><strong>${d.code}</strong></td>
+                <td>${d.discount_percentage}%</td>
+                <td>${d.expiration_date || 'No expiry'}</td>
+                <td>${d.is_active == 1 ? '<span class="badge badge-complete">Active</span>' : '<span class="badge badge-pending">Inactive</span>'}</td>
+                <td>
+                    <button class="btn-danger" onclick="deleteCode(${d.code_id})">Delete</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function openModal() {
+        document.getElementById('code-value').value   = '';
+        document.getElementById('code-percent').value = '';
+        document.getElementById('code-expiry').value  = '';
+        document.getElementById('code-active').checked = true;
+        document.getElementById('modal').classList.add('open');
+    }
+
+    function closeModal() {
+        document.getElementById('modal').classList.remove('open');
+    }
+
+    async function saveCode() {
+        const body = {
+            code:                document.getElementById('code-value').value.toUpperCase(),
+            discount_percentage: document.getElementById('code-percent').value,
+            expiration_date:     document.getElementById('code-expiry').value || null,
+            is_active:           document.getElementById('code-active').checked ? 1 : 0
+        };
+
+        const res  = await fetch('../backend/api/admin_discounts.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (data.success) { closeModal(); loadDiscounts(); }
+        else alert(data.error || 'Something went wrong.');
+    }
+
+    async function deleteCode(id) {
+        if (!confirm('Delete this code?')) return;
+        const res  = await fetch('../backend/api/admin_discounts.php', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code_id: id })
+        });
+        const data = await res.json();
+        if (data.success) loadDiscounts();
+        else alert(data.error || 'Something went wrong.');
+    }
+
+    loadDiscounts();
+</script>
+</body>
+</html>

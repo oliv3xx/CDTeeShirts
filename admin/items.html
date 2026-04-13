@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Items</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<div class="admin-layout">
+
+    <aside class="admin-sidebar">
+        <h2>Admin Panel</h2>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="items.html" class="active">Items</a>
+        <a href="users.html">Users</a>
+        <a href="orders.html">Orders</a>
+        <a href="discounts.html">Discount Codes</a>
+        <a href="../index.html" style="margin-top:40px; color:#666;">← Back to Site</a>
+    </aside>
+
+    <main class="admin-main">
+        <h1>Items</h1>
+
+        <div class="admin-table-wrap">
+            <div class="admin-table-header">
+                <h2>All Items</h2>
+                <button class="btn-primary" onclick="openModal()">+ Add Item</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Qty</th>
+                        <th>On Sale</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="items-table">
+                    <tr><td colspan="6" style="text-align:center; color:#aaa;">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="modal">
+    <div class="modal">
+        <h2 id="modal-title">Add Item</h2>
+        <div class="modal-form">
+            <input type="hidden" id="item-id">
+            <input type="text" id="item-name" placeholder="Item name" required>
+            <textarea id="item-desc" placeholder="Description" rows="3"></textarea>
+            <input type="number" id="item-price" placeholder="Price" step="0.01" required>
+            <input type="number" id="item-qty" placeholder="Quantity available" required>
+            <input type="text" id="item-img" placeholder="Image URL">
+            <label style="display:flex; align-items:center; gap:8px; font-size:14px;">
+                <input type="checkbox" id="item-sale"> On Sale
+            </label>
+            <input type="number" id="item-sale-price" placeholder="Sale price (if on sale)" step="0.01">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-save" onclick="saveItem()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function loadItems() {
+        const res  = await fetch('../backend/api/admin_items.php');
+        const data = await res.json();
+        const tbody = document.getElementById('items-table');
+
+        if (!data.length) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#aaa;">No items found.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = data.map(item => `
+            <tr>
+                <td>${item.item_id}</td>
+                <td>${item.item_name}</td>
+                <td>$${parseFloat(item.price).toFixed(2)}</td>
+                <td>${item.quantity_available}</td>
+                <td>${item.is_on_sale == 1 ? '<span class="badge badge-complete">Yes</span>' : 'No'}</td>
+                <td>
+                    <button class="btn-edit" onclick='openModal(${JSON.stringify(item)})'>Edit</button>
+                    <button class="btn-danger" onclick="deleteItem(${item.item_id})">Delete</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function openModal(item = null) {
+        document.getElementById('modal-title').textContent = item ? 'Edit Item' : 'Add Item';
+        document.getElementById('item-id').value         = item?.item_id || '';
+        document.getElementById('item-name').value       = item?.item_name || '';
+        document.getElementById('item-desc').value       = item?.description || '';
+        document.getElementById('item-price').value      = item?.price || '';
+        document.getElementById('item-qty').value        = item?.quantity_available || '';
+        document.getElementById('item-img').value        = item?.image_url || '';
+        document.getElementById('item-sale').checked     = item?.is_on_sale == 1;
+        document.getElementById('item-sale-price').value = item?.sale_price || '';
+        document.getElementById('modal').classList.add('open');
+    }
+
+    function closeModal() {
+        document.getElementById('modal').classList.remove('open');
+    }
+
+    async function saveItem() {
+        const id = document.getElementById('item-id').value;
+        const body = {
+            item_id:            id,
+            item_name:          document.getElementById('item-name').value,
+            description:        document.getElementById('item-desc').value,
+            price:              document.getElementById('item-price').value,
+            quantity_available: document.getElementById('item-qty').value,
+            image_url:          document.getElementById('item-img').value,
+            is_on_sale:         document.getElementById('item-sale').checked ? 1 : 0,
+            sale_price:         document.getElementById('item-sale-price').value
+        };
+
+        const res  = await fetch('../backend/api/admin_items.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (data.success) { closeModal(); loadItems(); }
+        else alert(data.error || 'Something went wrong.');
+    }
+
+    async function deleteItem(id) {
+        if (!confirm('Delete this item?')) return;
+        const res  = await fetch('../backend/api/admin_items.php', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ item_id: id })
+        });
+        const data = await res.json();
+        if (data.success) loadItems();
+        else alert(data.error || 'Something went wrong.');
+    }
+
+    loadItems();
+</script>
+</body>
+</html>
