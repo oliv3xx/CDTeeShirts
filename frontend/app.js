@@ -86,13 +86,34 @@ function updateCartCount() {
 }
 
 // PRODUCTS GRID ------------------------------------------
+function getFilteredProducts() {
+    const search = (document.getElementById('search-input')?.value || '').toLowerCase();
+    const sort   = document.getElementById('sort-select')?.value || '';
+ 
+    let filtered = products.filter(p =>
+        p.name.toLowerCase().includes(search)
+    );
+ 
+    if (sort === 'price_asc')   filtered.sort((a, b) => a.price - b.price);
+    if (sort === 'price_desc')  filtered.sort((a, b) => b.price - a.price);
+ 
+    return filtered;
+}
+ 
 function renderProducts(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
-
+ 
+    const list = containerId === 'shop-products' ? getFilteredProducts() : products;
+ 
     container.innerHTML = '';
-
-    products.forEach(product => {
+ 
+    if (list.length === 0) {
+        container.innerHTML = '<p style="color:#666; text-align:center; grid-column:1/-1;">No products found.</p>';
+        return;
+    }
+ 
+    list.forEach(product => {
         const card = document.createElement('div');
         card.className = 'product-card';
         card.innerHTML = `
@@ -105,13 +126,20 @@ function renderProducts(containerId) {
         `;
         container.appendChild(card);
     });
-
+ 
     document.querySelectorAll('.add-to-cart').forEach(button => {
         button.addEventListener('click', () => {
             const id = parseInt(button.getAttribute('data-id'));
             addToCart(id);
         });
     });
+}
+ 
+function setupShopControls() {
+    const searchInput = document.getElementById('search-input');
+    const sortSelect  = document.getElementById('sort-select');
+    if (searchInput) searchInput.addEventListener('input', () => renderProducts('shop-products'));
+    if (sortSelect)  sortSelect.addEventListener('change', () => renderProducts('shop-products'));
 }
 
 // CART PAGE ------------------------------------------
@@ -327,6 +355,7 @@ function init() {
     setupCheckout();
     setupLoginForm();
     setupRegisterForm();
+    setupShopControls();
     updateCartCount();
 }
 
