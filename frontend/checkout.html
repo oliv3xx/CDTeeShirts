@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - CDTeeShirts</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .checkout-section {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .checkout-form-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            padding: 30px;
+        }
+
+        .checkout-form-card h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .form-group input {
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #000;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .form-row input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .form-row input:focus {
+            outline: none;
+            border-color: #000;
+        }
+
+        .order-summary-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            padding: 30px;
+            height: fit-content;
+        }
+
+        .order-summary-card h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            padding: 8px 0;
+            color: #555;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .order-item span:last-child {
+            font-weight: bold;
+            color: #000;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            padding: 6px 0;
+            color: #555;
+        }
+
+        .summary-row.total {
+            font-size: 20px;
+            font-weight: bold;
+            color: #000;
+            border-top: 1px solid #eee;
+            margin-top: 10px;
+            padding-top: 14px;
+        }
+
+        .place-order-btn {
+            background: #000;
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .place-order-btn:hover {
+            background: #333;
+        }
+
+        .empty-cart-msg {
+            text-align: center;
+            padding: 60px 40px;
+            color: #666;
+        }
+
+        .success-screen {
+            display: none;
+            text-align: center;
+            max-width: 480px;
+            margin: 100px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+
+        .success-screen h2 {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .success-screen p {
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .checkmark {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>CDTeeShirts</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="shop.html">Shop</a>
+            <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+            <a href="login.html">Login</a>
+        </nav>
+    </header>
+
+    <!-- Success Screen -->
+    <div class="success-screen" id="success-screen">
+        <div class="checkmark">✓</div>
+        <h2>Order Placed!</h2>
+        <p>Thank you for shopping at CDTeeShirts. Your order has been received.</p>
+        <p id="order-id-msg" style="font-weight:bold; margin-bottom:24px;"></p>
+        <a href="shop.html" class="btn">Continue Shopping</a>
+    </div>
+
+    <!-- Checkout Form -->
+    <div id="checkout-content">
+        <div id="empty-msg" class="empty-cart-msg" style="display:none;">
+            <p>Your cart is empty. <a href="shop.html">Go shopping</a></p>
+        </div>
+
+        <div class="checkout-section" id="checkout-section">
+
+            <div>
+                <!-- Shipping Info -->
+                <div class="checkout-form-card" style="margin-bottom:24px;">
+                    <h2>Shipping Information</h2>
+                    <div class="form-group">
+                        <div class="form-row">
+                            <input type="text" id="first-name" placeholder="First Name" required>
+                            <input type="text" id="last-name" placeholder="Last Name" required>
+                        </div>
+                        <input type="email" id="email" placeholder="Email" required>
+                        <input type="text" id="address" placeholder="Street Address" required>
+                        <div class="form-row">
+                            <input type="text" id="city" placeholder="City" required>
+                            <input type="text" id="zip" placeholder="ZIP Code" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Info -->
+                <div class="checkout-form-card">
+                    <h2>Payment Information</h2>
+                    <div class="form-group">
+                        <input type="text" id="card-number" placeholder="Card Number (e.g. 4111 1111 1111 1111)" maxlength="19">
+                        <div class="form-row">
+                            <input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5">
+                            <input type="text" id="card-cvv" placeholder="CVV" maxlength="3">
+                        </div>
+                        <input type="text" id="card-name" placeholder="Name on Card">
+                    </div>
+                    <p style="font-size:12px; color:#aaa;">This is a demo — no real payment will be processed.</p>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="order-summary-card">
+                <h2>Order Summary</h2>
+                <div id="checkout-items"></div>
+                <div style="margin-top:16px;">
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span>$<span id="checkout-subtotal">0.00</span></span>
+                    </div>
+                    <div class="summary-row" id="checkout-discount-row" style="display:none;">
+                        <span>Discount</span>
+                        <span>-$<span id="checkout-discount">0.00</span></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Tax (8.25%)</span>
+                        <span>$<span id="checkout-tax">0.00</span></span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span>$<span id="checkout-total">0.00</span></span>
+                    </div>
+                </div>
+                <button class="place-order-btn" id="place-order-btn">Place Order</button>
+                <p class="auth-message error" id="checkout-error" style="margin-top:10px;"></p>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 CDTeeShirts. All rights reserved.</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        const TAX_RATE = 0.0825;
+
+        function loadCheckoutSummary() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const discountPercent = parseFloat(localStorage.getItem('discountPercent') || '0');
+            const discountCode = localStorage.getItem('discountCode') || '';
+
+            if (cart.length === 0) {
+                document.getElementById('checkout-section').style.display = 'none';
+                document.getElementById('empty-msg').style.display = 'block';
+                return;
+            }
+
+            // Render items
+            const itemsEl = document.getElementById('checkout-items');
+            let subtotal = 0;
+            itemsEl.innerHTML = cart.map(item => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                return `<div class="order-item">
+                    <span>${item.name} × ${item.quantity}</span>
+                    <span>$${itemTotal.toFixed(2)}</span>
+                </div>`;
+            }).join('');
+
+            const discountAmount = subtotal * (discountPercent / 100);
+            const taxable = subtotal - discountAmount;
+            const tax = taxable * TAX_RATE;
+            const total = taxable + tax;
+
+            document.getElementById('checkout-subtotal').textContent = subtotal.toFixed(2);
+            document.getElementById('checkout-tax').textContent = tax.toFixed(2);
+            document.getElementById('checkout-total').textContent = total.toFixed(2);
+
+            if (discountPercent > 0) {
+                document.getElementById('checkout-discount').textContent = discountAmount.toFixed(2);
+                document.getElementById('checkout-discount-row').style.display = 'flex';
+            }
+        }
+
+        document.getElementById('place-order-btn').addEventListener('click', async function() {
+            const firstName = document.getElementById('first-name').value.trim();
+            const lastName  = document.getElementById('last-name').value.trim();
+            const email     = document.getElementById('email').value.trim();
+            const address   = document.getElementById('address').value.trim();
+            const cardNum   = document.getElementById('card-number').value.trim();
+            const errorEl   = document.getElementById('checkout-error');
+
+            if (!firstName || !lastName || !email || !address || !cardNum) {
+                errorEl.textContent = 'Please fill in all required fields.';
+                return;
+            }
+
+            const cart           = JSON.parse(localStorage.getItem('cart') || '[]');
+            const discountCode   = localStorage.getItem('discountCode') || '';
+            const user           = JSON.parse(localStorage.getItem('user') || 'null');
+
+            if (!user) {
+                errorEl.textContent = 'You must be logged in to place an order.';
+                return;
+            }
+
+            const res = await fetch('backend/api/orders.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    items: cart.map(item => ({
+                        item_id:  item.id,
+                        quantity: item.quantity,
+                        price:    item.price
+                    })),
+                    discount_code: discountCode
+                })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                // Clear cart
+                localStorage.removeItem('cart');
+                localStorage.removeItem('discountCode');
+                localStorage.removeItem('discountPercent');
+
+                // Show success
+                document.getElementById('checkout-content').style.display = 'none';
+                document.getElementById('success-screen').style.display = 'block';
+                document.getElementById('order-id-msg').textContent = `Order #${data.order_id}`;
+            } else {
+                errorEl.textContent = data.error || 'Something went wrong. Please try again.';
+            }
+        });
+
+        loadCheckoutSummary();
+    </script>
+</body>
+</html>

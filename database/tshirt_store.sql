@@ -66,18 +66,21 @@ CREATE TABLE Cart (
 
 -- Insert test admin user
 INSERT INTO Users (username, password, email, first_name, last_name, is_admin) 
-VALUES ('admin', 'admin123', 'admin@tshirtstore.com', 'Admin', 'User', TRUE);
+VALUES ('admin', 'admin123', 'admin@cdteeshirts.com', 'Admin', 'User', TRUE);
 
 -- Insert regular test user
 INSERT INTO Users (username, password, email, first_name, last_name, is_admin) 
 VALUES ('testuser', 'password123', 'test@email.com', 'Test', 'User', FALSE);
 
--- Insert test t-shirts
+-- Insert t-shirts
 INSERT INTO Items (item_name, description, price, quantity_available, image_url) 
 VALUES 
-('Classic Logo Tee', 'Comfortable cotton tee with our logo', 19.99, 50, 'logo_tee.jpg'),
-('Graphic Print Tee', 'Bold graphic design on premium fabric', 24.99, 30, 'graphic_tee.jpg'),
-('Vintage Wash Tee', 'Retro style with vintage wash', 22.99, 40, 'vintage_tee.jpg');
+('Black Oversized Essential Tee', 'Classic black oversized tee, comfortable cotton blend', 35.00, 50, 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=830&auto=format&fit=crop'),
+('White Classic Blank Tee', 'Clean white essential tee, perfect for any occasion', 32.00, 50, 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?q=80&w=774&auto=format&fit=crop'),
+('Red Street Heavyweight Tee', 'Bold red heavyweight tee for a statement look', 38.00, 30, 'https://plus.unsplash.com/premium_photo-1691367279053-ffa6edf80181?w=400&auto=format&fit=crop&q=60'),
+('Navy Minimal Blank Tee', 'Navy blue minimal tee, versatile and clean', 30.00, 40, 'https://plus.unsplash.com/premium_photo-1689565524694-88720c282271?w=400&auto=format&fit=crop&q=60'),
+('Forest Green Boxy Tee', 'Forest green boxy fit tee, relaxed and stylish', 40.00, 25, 'https://images.unsplash.com/photo-1706550633351-293b55daccf4?w=400&auto=format&fit=crop&q=60'),
+('Beige Vintage Washed Tee', 'Beige vintage washed tee with a retro feel', 34.00, 35, 'https://plus.unsplash.com/premium_photo-1671656349262-1e1d3e09735c?w=400&auto=format&fit=crop&q=60');
 
 -- Insert a test discount code
 INSERT INTO DiscountCodes (code, discount_percentage, expiration_date) 
