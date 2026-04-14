@@ -268,7 +268,37 @@ function setupCheckout() {
     }
 }
 
-// ─── Login / Register ─────────────────────────────────────────────────────────
+// ─── Checkout Card Formatting ─────────────────────────────────────────────────
+
+function setupCardFormatting() {
+    const cardNumber = document.getElementById('card-number');
+    const cardExpiry = document.getElementById('card-expiry');
+    const cardCvv    = document.getElementById('card-cvv');
+
+    if (cardNumber) {
+        cardNumber.addEventListener('input', function() {
+            let val = this.value.replace(/\D/g, '').slice(0, 16);
+            this.value = val.match(/.{1,4}/g)?.join(' ') || val;
+        });
+    }
+
+    if (cardExpiry) {
+        cardExpiry.addEventListener('input', function() {
+            let val = this.value.replace(/\D/g, '').slice(0, 4);
+            if (val.length >= 3) {
+                this.value = val.slice(0, 2) + '/' + val.slice(2);
+            } else {
+                this.value = val;
+            }
+        });
+    }
+
+    if (cardCvv) {
+        cardCvv.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 3);
+        });
+    }
+}
 
 function showTab(tab) {
     document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
@@ -362,6 +392,7 @@ function init() {
     setupLoginForm();
     setupRegisterForm();
     setupShopControls();
+    setupCardFormatting();
     updateCartCount();
 }
 
