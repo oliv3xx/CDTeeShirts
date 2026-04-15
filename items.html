@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Items</title>
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="admin.css">
 </head>
 <body>
@@ -18,7 +18,7 @@
         <a href="users.html">Users</a>
         <a href="orders.html">Orders</a>
         <a href="discounts.html">Discount Codes</a>
-        <a href="../index.html" style="margin-top:40px; color:#666;">← Back to Site</a>
+        <a href="index.html" style="margin-top:40px; color:#666;">← Back to Site</a>
     </aside>
 
     <main class="admin-main">
@@ -74,7 +74,7 @@
 
 <script>
     async function loadItems() {
-        const res  = await fetch('../backend/api/admin_items.php');
+        const res  = await fetch('admin_items.php');
         const data = await res.json();
         const tbody = document.getElementById('items-table');
 
@@ -128,7 +128,7 @@
             sale_price:         document.getElementById('item-sale-price').value
         };
 
-        const res  = await fetch('../backend/api/admin_items.php', {
+        const res  = await fetch('admin_items.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
@@ -140,7 +140,7 @@
 
     async function deleteItem(id) {
         if (!confirm('Delete this item?')) return;
-        const res  = await fetch('../backend/api/admin_items.php', {
+        const res  = await fetch('admin_items.php', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ item_id: id })

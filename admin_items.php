@@ -3,7 +3,7 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, DELETE');
 
-require_once '../db.php';
+require_once 'db.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 

@@ -323,7 +323,7 @@ function setupLoginForm() {
         msg.className = 'auth-message';
         msg.textContent = 'Logging in...';
 
-        const res = await fetch('backend/api/login.php', {
+        const res = await fetch('login.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -356,7 +356,7 @@ function setupRegisterForm() {
         msg.className = 'auth-message';
         msg.textContent = 'Creating account...';
 
-        const res = await fetch('backend/api/register.php', {
+        const res = await fetch('register.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

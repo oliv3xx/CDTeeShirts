@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Discount Codes</title>
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="admin.css">
 </head>
 <body>
@@ -18,7 +18,7 @@
         <a href="users.html">Users</a>
         <a href="orders.html">Orders</a>
         <a href="discounts.html" class="active">Discount Codes</a>
-        <a href="../index.html" style="margin-top:40px; color:#666;">← Back to Site</a>
+        <a href="index.html" style="margin-top:40px; color:#666;">← Back to Site</a>
     </aside>
 
     <main class="admin-main">
@@ -69,7 +69,7 @@
 
 <script>
     async function loadDiscounts() {
-        const res  = await fetch('../backend/api/admin_discounts.php');
+        const res  = await fetch('admin_discounts.php');
         const data = await res.json();
         const tbody = document.getElementById('discounts-table');
 
@@ -111,7 +111,7 @@
             is_active:           document.getElementById('code-active').checked ? 1 : 0
         };
 
-        const res  = await fetch('../backend/api/admin_discounts.php', {
+        const res  = await fetch('admin_discounts.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
@@ -123,7 +123,7 @@
 
     async function deleteCode(id) {
         if (!confirm('Delete this code?')) return;
-        const res  = await fetch('../backend/api/admin_discounts.php', {
+        const res  = await fetch('admin_discounts.php', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ code_id: id })

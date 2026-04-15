@@ -2,7 +2,7 @@
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
-require_once '../db.php';
+require_once 'db.php';
 
 // Allowed sort columns to prevent SQL injection
 $allowed_sorts = [

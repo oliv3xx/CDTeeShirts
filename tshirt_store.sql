@@ -72,7 +72,7 @@ VALUES ('admin', 'admin123', 'admin@cdteeshirts.com', 'Admin', 'User', TRUE);
 INSERT INTO Users (username, password, email, first_name, last_name, is_admin) 
 VALUES ('testuser', 'password123', 'test@email.com', 'Test', 'User', FALSE);
 
--- Insert t-shirts
+-- Insert t-shirts with real image URLs
 INSERT INTO Items (item_name, description, price, quantity_available, image_url) 
 VALUES 
 ('Black Oversized Essential Tee', 'Classic black oversized tee, comfortable cotton blend', 35.00, 50, 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=830&auto=format&fit=crop'),

@@ -321,7 +321,7 @@
                 return;
             }
 
-            const res = await fetch('backend/api/orders.php', {
+            const res = await fetch('orders.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
