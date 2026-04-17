@@ -268,7 +268,52 @@ function setupCheckout() {
     }
 }
 
-// ─── Checkout Card Formatting ─────────────────────────────────────────────────
+// ─── Nav User State ───────────────────────────────────────────────────────────
+
+function updateNav() {
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    const loginLink = document.querySelector('a[href="login.html"]');
+    if (!loginLink) return;
+
+    if (user) {
+        // Hide login link
+        loginLink.style.display = 'none';
+
+        // Build dropdown HTML
+        const dropdown = document.createElement('div');
+        dropdown.className = 'user-dropdown';
+        dropdown.innerHTML = `
+            <div class="user-bubble">
+                <span>Hi, ${user.first_name || user.username}</span>
+                <span class="user-arrow">▾</span>
+            </div>
+            <div class="user-menu" id="user-menu">
+                ${user.is_admin == 1 ? '<a href="dashboard.html">Admin Dashboard</a>' : ''}
+                <a href="#" id="logout-btn">Logout</a>
+            </div>
+        `;
+
+        loginLink.parentNode.appendChild(dropdown);
+
+        // Toggle dropdown
+        dropdown.querySelector('.user-bubble').addEventListener('click', () => {
+            dropdown.querySelector('.user-menu').classList.toggle('open');
+        });
+
+        // Close when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!dropdown.contains(e.target)) {
+                dropdown.querySelector('.user-menu').classList.remove('open');
+            }
+        });
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        });
+    }
+}
 
 function setupCardFormatting() {
     const cardNumber = document.getElementById('card-number');
@@ -393,6 +438,7 @@ function init() {
     setupRegisterForm();
     setupShopControls();
     setupCardFormatting();
+    updateNav();
     updateCartCount();
 }
 
