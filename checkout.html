@@ -175,7 +175,7 @@
     </header>
 
     <!-- Success Screen -->
-    <div class="success-screen" id="success-screen">
+    <div class="success-screen" id="success-screen" style="display:none;">
         <div class="checkmark">✓</div>
         <h2>Order Placed!</h2>
         <p>Thank you for shopping at CDTeeShirts. Your order has been received.</p>
@@ -257,7 +257,6 @@
         <p>&copy; 2026 CDTeeShirts. All rights reserved.</p>
     </footer>
 
-    <script src="app.js"></script>
     <script>
         const TAX_RATE = 0.0825;
 
@@ -325,6 +324,7 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    user_id:       user ? user.user_id : 0,
                     items: cart.map(item => ({
                         item_id:  item.id,
                         quantity: item.quantity,
@@ -352,6 +352,39 @@
         });
 
         loadCheckoutSummary();
+
+        // Update cart count in nav
+        const cartData = JSON.parse(localStorage.getItem('cart') || '[]');
+        const totalItems = cartData.reduce((sum, item) => sum + item.quantity, 0);
+        const cartCountEl = document.getElementById('cart-count');
+        if (cartCountEl) cartCountEl.textContent = totalItems;
+
+        // Card formatting
+        const cardNumber = document.getElementById('card-number');
+        const cardExpiry = document.getElementById('card-expiry');
+        const cardCvv    = document.getElementById('card-cvv');
+
+        if (cardNumber) {
+            cardNumber.addEventListener('input', function() {
+                let val = this.value.replace(/\D/g, '').slice(0, 16);
+                this.value = val.match(/.{1,4}/g)?.join(' ') || val;
+            });
+        }
+        if (cardExpiry) {
+            cardExpiry.addEventListener('input', function() {
+                let val = this.value.replace(/\D/g, '').slice(0, 4);
+                if (val.length >= 3) {
+                    this.value = val.slice(0, 2) + '/' + val.slice(2);
+                } else {
+                    this.value = val;
+                }
+            });
+        }
+        if (cardCvv) {
+            cardCvv.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '').slice(0, 3);
+            });
+        }
     </script>
 </body>
 </html>

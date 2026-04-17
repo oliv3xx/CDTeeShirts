@@ -3,7 +3,6 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 
-session_start();
 require_once 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -11,17 +10,17 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['error' => 'You must be logged in to place an order']);
-    exit;
-}
-
 $data = json_decode(file_get_contents('php://input'), true);
 
-$user_id       = $_SESSION['user_id'];
+$user_id       = (int)($data['user_id'] ?? 0);
 $items         = $data['items'] ?? [];
 $discount_code = trim($data['discount_code'] ?? '');
 $TAX_RATE      = 0.0825;
+
+if (!$user_id) {
+    echo json_encode(['error' => 'You must be logged in to place an order']);
+    exit;
+}
 
 if (empty($items)) {
     echo json_encode(['error' => 'Cart is empty']);
