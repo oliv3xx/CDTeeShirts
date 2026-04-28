@@ -282,17 +282,29 @@ tr:hover td {
 }
 
 .status-select {
-    padding: 6px 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 13px;
-    background: white;
+    padding: 4px 10px;
+    border: none;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: bold;
     cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    text-align: center;
 }
+
+.status-select[value="pending"],
+.status-select:has(option[value="pending"]:checked) {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-select option[value="pending"] { background: #fff3cd; color: #856404; }
+.status-select option[value="complete"] { background: #d1e7dd; color: #0a5931; }
+.status-select option[value="cancelled"] { background: #f8d7da; color: #842029; }
 
 .status-select:focus {
     outline: none;
-    border-color: #000;
 }
 
 .badge {
