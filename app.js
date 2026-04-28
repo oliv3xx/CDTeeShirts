@@ -102,11 +102,17 @@ function renderProducts(containerId) {
         card.className = 'product-card';
         const stockColor = product.quantity_available > 10 ? '#27ae60' : product.quantity_available > 0 ? '#e67e22' : '#c0392b';
         const stockText = product.quantity_available > 0 ? `${product.quantity_available} in stock` : 'Out of stock';
+        const isOnSale = product.is_on_sale == 1 && product.sale_price;
+        const priceDisplay = isOnSale
+            ? `<p class="price"><span style="text-decoration:line-through; color:#aaa; font-size:16px;">$${parseFloat(product.price).toFixed(2)}</span> <span style="color:#c0392b;">$${parseFloat(product.sale_price).toFixed(2)}</span></p>`
+            : `<p class="price">$${parseFloat(product.price).toFixed(2)}</p>`;
+
         card.innerHTML = `
             <img src="${product.img || product.image_url}" alt="${product.name || product.item_name}">
+            ${isOnSale ? '<div class="sale-badge">SALE</div>' : ''}
             <div class="product-info">
                 <h3>${product.name || product.item_name}</h3>
-                <p class="price">$${parseFloat(product.price).toFixed(2)}</p>
+                ${priceDisplay}
                 <p class="stock-count" style="font-size:13px; color:${stockColor}; margin-bottom:10px;">${stockText}</p>
                 <button class="add-to-cart" data-id="${product.id || product.item_id}" ${product.quantity_available == 0 ? 'disabled' : ''}>
                     ${product.quantity_available > 0 ? 'Add to Cart' : 'Out of Stock'}
