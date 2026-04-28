@@ -1,43 +1,17 @@
-// ─── Products (temporary hardcoded data until backend is connected) ───────────
+// ─── Products (fetched from database) ────────────────────────────────────────
 
-const products = [
-    {
-        id: 1,
-        name: "Black Oversized Essential Tee",
-        price: 35,
-        img: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=830&auto=format&fit=crop"
-    },
-    {
-        id: 2,
-        name: "White Classic Blank Tee",
-        price: 32,
-        img: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?q=80&w=774&auto=format&fit=crop"
-    },
-    {
-        id: 3,
-        name: "Red Street Heavyweight Tee",
-        price: 38,
-        img: "https://plus.unsplash.com/premium_photo-1691367279053-ffa6edf80181?w=400&auto=format&fit=crop&q=60"
-    },
-    {
-        id: 4,
-        name: "Navy Minimal Blank Tee",
-        price: 30,
-        img: "https://plus.unsplash.com/premium_photo-1689565524694-88720c282271?w=400&auto=format&fit=crop&q=60"
-    },
-    {
-        id: 5,
-        name: "Forest Green Boxy Tee",
-        price: 40,
-        img: "https://images.unsplash.com/photo-1706550633351-293b55daccf4?w=400&auto=format&fit=crop&q=60"
-    },
-    {
-        id: 6,
-        name: "Beige Vintage Washed Tee",
-        price: 34,
-        img: "https://plus.unsplash.com/premium_photo-1671656349262-1e1d3e09735c?w=400&auto=format&fit=crop&q=60"
+let products = [];
+
+async function loadProducts() {
+    try {
+        const res  = await fetch('products.php');
+        products   = await res.json();
+        renderProducts('featured-products');
+        renderProducts('shop-products');
+    } catch (err) {
+        console.error('Could not load products:', err);
     }
-];
+}
 
 // ─── Cart ─────────────────────────────────────────────────────────────────────
 
@@ -54,19 +28,24 @@ function loadCart() {
 }
 
 function addToCart(productId) {
-    const product = products.find(p => p.id === productId);
+    const product = products.find(p => (p.id || p.item_id) == productId);
     if (!product) return;
 
-    const existing = cart.find(item => item.id === productId);
+    const id    = product.id || product.item_id;
+    const name  = product.name || product.item_name;
+    const price = parseFloat(product.price);
+    const img   = product.img || product.image_url;
+
+    const existing = cart.find(item => item.id == id);
     if (existing) {
         existing.quantity += 1;
     } else {
-        cart.push({ ...product, quantity: 1 });
+        cart.push({ id, name, price, img, quantity: 1 });
     }
 
     saveCart();
     updateCartCount();
-    showToast(`${product.name} added to cart!`);
+    showToast(`${name} added to cart!`);
 }
 
 function showToast(message) {
@@ -94,11 +73,13 @@ function getFilteredProducts() {
     const sort   = document.getElementById('sort-select')?.value || '';
 
     let filtered = products.filter(p =>
-        p.name.toLowerCase().includes(search)
+        (p.name || p.item_name || '').toLowerCase().includes(search) ||
+        (p.description || '').toLowerCase().includes(search)
     );
 
-    if (sort === 'price_asc')   filtered.sort((a, b) => a.price - b.price);
-    if (sort === 'price_desc')  filtered.sort((a, b) => b.price - a.price);
+    if (sort === 'price_asc')    filtered.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+    if (sort === 'price_desc')   filtered.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+    if (sort === 'availability') filtered.sort((a, b) => parseInt(b.quantity_available) - parseInt(a.quantity_available));
 
     return filtered;
 }
@@ -435,8 +416,7 @@ function setupRegisterForm() {
 
 function init() {
     loadCart();
-    renderProducts('featured-products');
-    renderProducts('shop-products');
+    loadProducts();
     renderCart();
     setupCheckout();
     setupLoginForm();
