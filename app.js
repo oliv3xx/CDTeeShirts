@@ -234,25 +234,34 @@ function setupCheckout() {
     const checkoutBtn = document.getElementById('checkout-btn');
 
     if (applyBtn) {
-        applyBtn.addEventListener('click', () => {
+        applyBtn.addEventListener('click', async () => {
             const code = document.getElementById('discount-input').value.trim().toUpperCase();
             const msg  = document.getElementById('discount-msg');
+            msg.className = 'discount-msg';
+            msg.textContent = 'Checking...';
 
-            // For now, match the test code from the database
-            if (code === 'SAVE10') {
-                discountPercent = 10;
-                localStorage.setItem('discountPercent', discountPercent);
-                localStorage.setItem('discountCode', code);
-                msg.className   = 'discount-msg success';
-                msg.textContent = '10% discount applied!';
-            } else {
-                discountPercent = 0;
-                localStorage.removeItem('discountPercent');
-                localStorage.removeItem('discountCode');
+            try {
+                const res  = await fetch(`check_discount.php?code=${encodeURIComponent(code)}`);
+                const data = await res.json();
+
+                if (data.success) {
+                    discountPercent = parseFloat(data.discount_percentage);
+                    localStorage.setItem('discountPercent', discountPercent);
+                    localStorage.setItem('discountCode', code);
+                    msg.className   = 'discount-msg success';
+                    msg.textContent = `${discountPercent}% discount applied!`;
+                } else {
+                    discountPercent = 0;
+                    localStorage.removeItem('discountPercent');
+                    localStorage.removeItem('discountCode');
+                    msg.className   = 'discount-msg error';
+                    msg.textContent = data.error || 'Invalid or expired discount code.';
+                }
+                updateCartSummary();
+            } catch (err) {
                 msg.className   = 'discount-msg error';
-                msg.textContent = 'Invalid or expired discount code.';
+                msg.textContent = 'Could not validate code. Try again.';
             }
-            updateCartSummary();
         });
     }
 
