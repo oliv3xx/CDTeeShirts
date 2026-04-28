@@ -1,8 +1,31 @@
 <?php
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST');
 
 require_once 'db.php';
+
+$method = $_SERVER['REQUEST_METHOD'];
+
+// POST - update order status
+if ($method === 'POST') {
+    $data     = json_decode(file_get_contents('php://input'), true);
+    $order_id = (int)($data['order_id'] ?? 0);
+    $status   = mysqli_real_escape_string($conn, $data['status'] ?? 'pending');
+
+    $allowed = ['pending', 'complete', 'cancelled'];
+    if (!in_array($status, $allowed)) {
+        echo json_encode(['error' => 'Invalid status']);
+        exit;
+    }
+
+    if (mysqli_query($conn, "UPDATE Orders SET status='$status' WHERE order_id=$order_id")) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['error' => mysqli_error($conn)]);
+    }
+    exit;
+}
 
 // Allowed sort columns to prevent SQL injection
 $allowed_sorts = [

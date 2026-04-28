@@ -281,6 +281,20 @@ tr:hover td {
     cursor: pointer;
 }
 
+.status-select {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    background: white;
+    cursor: pointer;
+}
+
+.status-select:focus {
+    outline: none;
+    border-color: #000;
+}
+
 .badge {
     display: inline-block;
     padding: 3px 10px;
