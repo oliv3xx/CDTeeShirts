@@ -119,12 +119,17 @@ function renderProducts(containerId) {
     list.forEach(product => {
         const card = document.createElement('div');
         card.className = 'product-card';
+        const stockColor = product.quantity_available > 10 ? '#27ae60' : product.quantity_available > 0 ? '#e67e22' : '#c0392b';
+        const stockText = product.quantity_available > 0 ? `${product.quantity_available} in stock` : 'Out of stock';
         card.innerHTML = `
-            <img src="${product.img}" alt="${product.name}">
+            <img src="${product.img || product.image_url}" alt="${product.name || product.item_name}">
             <div class="product-info">
-                <h3>${product.name}</h3>
-                <p class="price">$${product.price}</p>
-                <button class="add-to-cart" data-id="${product.id}">Add to Cart</button>
+                <h3>${product.name || product.item_name}</h3>
+                <p class="price">$${parseFloat(product.price).toFixed(2)}</p>
+                <p class="stock-count" style="font-size:13px; color:${stockColor}; margin-bottom:10px;">${stockText}</p>
+                <button class="add-to-cart" data-id="${product.id || product.item_id}" ${product.quantity_available == 0 ? 'disabled' : ''}>
+                    ${product.quantity_available > 0 ? 'Add to Cart' : 'Out of Stock'}
+                </button>
             </div>
         `;
         container.appendChild(card);

@@ -159,8 +159,13 @@ nav a:hover {
     font-weight: bold;
 }
 
-.add-to-cart:hover {
-    background: #333;
+.add-to-cart:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.add-to-cart:disabled:hover {
+    background: #ccc;
 }
 
 /* Toast notification */
