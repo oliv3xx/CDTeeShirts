@@ -47,7 +47,6 @@
                         <th>Tax</th>
                         <th>Discount</th>
                         <th>Total</th>
-                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="orders-table">
@@ -80,7 +79,6 @@
                 <td>$${parseFloat(o.tax).toFixed(2)}</td>
                 <td>$${parseFloat(o.discount_amount).toFixed(2)}</td>
                 <td><strong>$${parseFloat(o.total).toFixed(2)}</strong></td>
-                <td><span class="badge badge-${o.status === 'complete' ? 'complete' : 'pending'}">${o.status}</span></td>
             </tr>
         `).join('');
     }
