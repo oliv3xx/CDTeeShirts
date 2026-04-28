@@ -80,28 +80,9 @@
                 <td>$${parseFloat(o.tax).toFixed(2)}</td>
                 <td>$${parseFloat(o.discount_amount).toFixed(2)}</td>
                 <td><strong>$${parseFloat(o.total).toFixed(2)}</strong></td>
-                <td>
-                    <select class="status-select" data-id="${o.order_id}" onchange="updateStatus(this)">
-                        <option value="pending" ${o.status === 'pending' ? 'selected' : ''}>Pending</option>
-                        <option value="complete" ${o.status === 'complete' ? 'selected' : ''}>Complete</option>
-                        <option value="cancelled" ${o.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
-                    </select>
-                </td>
+                <td><span class="badge badge-${o.status === 'complete' ? 'complete' : 'pending'}">${o.status}</span></td>
             </tr>
         `).join('');
-    }
-
-    async function updateStatus(select) {
-        const order_id = select.getAttribute('data-id');
-        const status   = select.value;
-
-        const res  = await fetch('admin_orders.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ order_id, status })
-        });
-        const data = await res.json();
-        if (!data.success) alert('Failed to update status.');
     }
 
     loadOrders();
