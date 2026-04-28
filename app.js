@@ -68,6 +68,10 @@ function updateCartCount() {
 
 // ─── Products Grid ────────────────────────────────────────────────────────────
 
+function getEffectivePrice(p) {
+    return (p.is_on_sale == 1 && p.sale_price) ? parseFloat(p.sale_price) : parseFloat(p.price);
+}
+
 function getFilteredProducts() {
     const search = (document.getElementById('search-input')?.value || '').toLowerCase();
     const sort   = document.getElementById('sort-select')?.value || '';
@@ -77,8 +81,8 @@ function getFilteredProducts() {
         (p.description || '').toLowerCase().includes(search)
     );
 
-    if (sort === 'price_asc')    filtered.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
-    if (sort === 'price_desc')   filtered.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+    if (sort === 'price_asc')    filtered.sort((a, b) => getEffectivePrice(a) - getEffectivePrice(b));
+    if (sort === 'price_desc')   filtered.sort((a, b) => getEffectivePrice(b) - getEffectivePrice(a));
     if (sort === 'availability') filtered.sort((a, b) => parseInt(b.quantity_available) - parseInt(a.quantity_available));
 
     return filtered;
