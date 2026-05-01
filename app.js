@@ -151,6 +151,9 @@ function renderCart() {
     const summary   = document.getElementById('cart-summary');
     if (!container) return;
 
+    // Reset discount on cart load
+    discountPercent = parseFloat(localStorage.getItem('discountPercent') || '0');
+
     container.innerHTML = '';
 
     if (cart.length === 0) {
@@ -233,6 +236,8 @@ function setupCheckout() {
     const applyBtn   = document.getElementById('apply-discount');
     const checkoutBtn = document.getElementById('checkout-btn');
 
+    const removeBtn = document.getElementById('remove-discount');
+
     if (applyBtn) {
         applyBtn.addEventListener('click', async () => {
             const code = document.getElementById('discount-input').value.trim().toUpperCase();
@@ -250,18 +255,32 @@ function setupCheckout() {
                     localStorage.setItem('discountCode', code);
                     msg.className   = 'discount-msg success';
                     msg.textContent = `${discountPercent}% discount applied!`;
+                    if (removeBtn) removeBtn.style.display = 'inline-block';
                 } else {
                     discountPercent = 0;
                     localStorage.removeItem('discountPercent');
                     localStorage.removeItem('discountCode');
                     msg.className   = 'discount-msg error';
                     msg.textContent = data.error || 'Invalid or expired discount code.';
+                    if (removeBtn) removeBtn.style.display = 'none';
                 }
                 updateCartSummary();
             } catch (err) {
                 msg.className   = 'discount-msg error';
                 msg.textContent = 'Could not validate code. Try again.';
             }
+        });
+    }
+
+    if (removeBtn) {
+        removeBtn.addEventListener('click', () => {
+            discountPercent = 0;
+            localStorage.removeItem('discountPercent');
+            localStorage.removeItem('discountCode');
+            document.getElementById('discount-input').value = '';
+            document.getElementById('discount-msg').textContent = '';
+            removeBtn.style.display = 'none';
+            updateCartSummary();
         });
     }
 
